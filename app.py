@@ -1,0 +1,129 @@
+from flask import Flask, render_template, request, session, flash, redirect
+from werkzeug.security import check_password_hash, generate_password_hash
+from cs50 import SQL
+from helpers import flash_and_redirect, get_email_password
+from datetime import datetime
+
+app = Flask(__name__)
+app.secret_key = "SECRET2026"
+
+db = SQL("sqlite:///notes.db")
+
+# Index page - login
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+# Home
+@app.route("/home")
+def home():
+    notes = db.execute("SELECT * FROM notes WHERE user_id = ? ORDER BY updated_at DESC", session.get("user_id"))
+    return render_template("home.html", notes=notes)
+
+# Login
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        session.clear()
+        
+        result = get_email_password()
+        if result is None:
+            return redirect("/login")
+        
+        email, password = result
+        
+        existed_user = db.execute("SELECT * FROM users WHERE email = ?", email)
+        if len(existed_user) != 1 or not check_password_hash(existed_user[0]["password"], password):
+            return flash_and_redirect("Invalid credentials", "danger", "/login")
+        
+        session["user_id"] = existed_user[0]["id"]
+        
+        return flash_and_redirect(f"Successfully logged in {existed_user[0]['username']}", "success", "/home")
+        
+    return render_template("index.html")
+        
+# Logout
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+  
+# Register
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST": 
+        result = get_email_password()
+        if result is None:
+            return redirect("/register")
+        email, password = result
+        
+        username = request.form.get("username")
+        if not username:
+            return flash_and_redirect("Must provide Username", "danger", "/register")
+            
+        
+        hash_password = generate_password_hash(password)
+        
+        try:
+            db.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", username, email, hash_password) 
+        except ValueError:
+            flash("Please log in or try register with different email.", "danger")
+            return redirect("/register")
+            
+            
+        user = db.execute("SELECT * FROM users WHERE email = ?", email)
+        session["user_id"] = user[0]["id"]
+
+        return flash_and_redirect(f"Successfully registered in {user[0]['username']}", "success", "/home")
+    
+    return render_template("register.html")
+
+# Create note
+@app.route("/create")
+def create():
+    return render_template("create.html")
+
+# Add note
+@app.route("/add", methods=["POST"])
+def add():
+    title = request.form.get("title")
+    content = request.form.get("content")
+    
+    if not title:
+        return flash_and_redirect("Must provide title", "danger", "/create")
+    if not content:
+        return flash_and_redirect("Must add some note", "danger", "/create")
+    
+    db.execute("INSERT INTO notes (user_id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)", session.get("user_id"), title, content, datetime.now(), datetime.now())
+    
+    return flash_and_redirect("Successfully added a note", "success", "/home")
+      
+# Show note
+@app.route("/note/<int:id>")
+def note(id):
+    note = db.execute("SELECT * FROM notes WHERE id = ? AND user_id = ?", id, session.get("user_id"))
+    return render_template("note.html", note=note)
+
+# Update or delete
+@app.route("/update", methods=["POST"])
+def update():
+    title = request.form.get("title")
+    content = request.form.get("content")
+    id = request.form.get("id")
+    action = request.form.get("action")
+    
+    if action == "update":
+        existed_note = db.execute("SELECT * FROM notes WHERE id = ? AND user_id = ?", id, session.get("user_id"))
+
+        if title == existed_note[0]["title"] and content == existed_note[0]["content"]:
+            return flash_and_redirect("Please make some changes to update a note", "danger", f"/note/{id}")
+
+        db.execute("UPDATE notes SET title = ?, content = ?, updated_at = ? WHERE id = ? AND user_id = ?", title, content, datetime.now(), id, session.get("user_id"))
+    else:
+        db.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", id, session.get("user_id"))
+    
+    return flash_and_redirect(f'Successfully {action}d "{title}"', "success", "/home")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
