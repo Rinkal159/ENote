@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<form action="/update" method="post" class="max-w-[80%] mx-auto bg-white flex flex-col items-start gap-4 ">
+
+    <input type="hidden" name="id" value="{{note[0]['id']}}">
+
+    <!-- title -->
+    <input
+        class="border-0 bg-white focus:outline-none focus:ring-0 focus:border-gray-400 active:outline-none text-4xl m-8 mb-4 font-medium"
+        type="text" name="title" autocomplete="off" value="{{note[0]['title']}}">
+
+    <!-- content -->
+    <textarea class="outline-none focus:outline-none focus:ring-0 resize-none text-2xl mx-8" name="content" rows="12"
+        cols="100" placeholder="Your note starts here...">{{note[0]['content']}}</textarea>
+
+    <div class="flex">
+        <!-- update button -->
+        <button
+            class="btn-form rounded-xl px-6 py-1.5 bg-white border-2 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300 ml-8 mb-8"
+            type="submit" name="action" value="update">Update</button>
+
+        <!-- update button -->
+        <button
+            class="btn-form rounded-xl px-6 py-1.5 bg-white border-2 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300 ml-4 mb-8"
+            type="submit" name="action" value="delete">Delete</button>
+    </div>
+</form>
+
+{% endblock %}
