@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+
+<div class="grid grid-cols-4 gap-y-8 max-w-[80%] mx-auto">
+    <a href="/create" class="inline-block">
+        <div
+            class="box relative cursor-pointer rounded-xl h-80 w-64 border-2 border-gray-600 bg-white hover:scale-105 transition duration-300">
+            <span class="absolute text-9xl font-thin top-16 left-20">+</span>
+        </div>
+    </a>
+
+
+    {% for note in notes %}
+    <a href="/note/{{note['id']}}" class="inline-block">
+        <div
+            class="note-box relative cursor-pointer rounded-xl h-80 w-64 bg-white hover:scale-105 transition duration-300">
+            <h2 class="text-2xl font-medium px-[1.5rem] py-[1.5rem] pb-2">{{ note["title"] }}</h2>
+            <p class="text-lg px-[1.5rem] pb-[1.5rem] line-clamp-6">{{ note["content"] }}</p>
+        </div>
+    </a>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
