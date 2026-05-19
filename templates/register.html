@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h2 class="text-center text-3xl pt-6 text-dark font-medium">
+    Register
+</h2>
+
+<form class="flex flex-col items-center mt-6 gap-3" action="/register" method="post">
+
+    <!-- email -->
+    <input
+        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+        type="email" name="email" placeholder="Email" autocomplete="off">
+
+    <!-- username -->
+    <input
+        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+        type="text" name="username" placeholder="Username" autocomplete="off">
+
+    <!-- password -->
+    <input
+        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+        type="password" name="password" placeholder="Password">
+
+    <!-- confirm password -->
+    <input
+        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+        type="password" name="confirmation" placeholder="Confirm Password">
+
+    <!-- register button -->
+    <button
+        class="btn rounded-2xl px-6 py-2 bg-white border-3 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300"
+        type="submit">
+
+        Register
+
+    </button>
+
+</form>
+
+<p class="text-center mt-4">
+    Already have an account?
+    <a class="text-blue-700 underline" href="/login">
+        Login
+    </a>
+</p>
+
+{% endblock %}
