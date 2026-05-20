@@ -1,21 +1,340 @@
-{% extends "layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block body %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ENote — Your thoughts, ideas, and notes, all in one place.</title>
+  <!-- Tailwind CSS + Google Fonts (Inter / SF style) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Inter', 'system-ui', 'SF Pro Display', 'SF Pro Text', 'Segoe UI', '-apple-system', 'sans-serif'],
+          },
+          animation: {
+            'float-gentle': 'floatGentle 7s ease-in-out infinite',
+            'float-medium': 'floatMedium 12s ease-in-out infinite',
+            'float-swirl': 'floatSwirl 9s ease-in-out infinite',
+            'drift-slow': 'driftSlow 18s linear infinite',
+            'pulse-glow-soft': 'pulseGlowSoft 4.5s ease-in-out infinite',
+            'gradient-shift': 'gradientShift 15s ease infinite',
+            'aurora-move': 'auroraMove 20s ease infinite alternate',
+          },
+          keyframes: {
+            floatGentle: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-18px) rotate(2deg)' },
+            },
+            floatMedium: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(-1deg) scale(1)' },
+              '50%': { transform: 'translateY(-24px) rotate(3deg) scale(1.02)' },
+            },
+            floatSwirl: {
+              '0%, 100%': { transform: 'translate(0px, 0px) rotate(0deg)' },
+              '33%': { transform: 'translate(-10px, -12px) rotate(4deg)' },
+              '66%': { transform: 'translate(10px, -8px) rotate(-2deg)' },
+            },
+            driftSlow: {
+              '0%': { transform: 'translateX(0%) rotate(0deg)' },
+              '100%': { transform: 'translateX(-12%) rotate(6deg)' },
+            },
+            pulseGlowSoft: {
+              '0%, 100%': { opacity: 0.2, transform: 'scale(0.96)' },
+              '50%': { opacity: 0.5, transform: 'scale(1.08)' },
+            },
+            gradientShift: {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            auroraMove: {
+              '0%': { transform: 'translateX(-10%) translateY(-5%) scale(1)' },
+              '100%': { transform: 'translateX(10%) translateY(5%) scale(1.2)' },
+            }
+          },
+          backgroundImage: {
+            'radial-glow': 'radial-gradient(circle at 30% 20%, rgba(255,235,205,0.6) 0%, rgba(255,245,235,0.3) 70%)',
+            'warm-mesh': 'linear-gradient(125deg, #FFF7ED 0%, #FFF9F0 45%, #FFF3E4 100%)',
+          },
+          boxShadow: {
+            'glass-premium': '0 20px 40px -12px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02), 0 1px 1px rgba(255,255,240,0.8) inset',
+            'warm-elevated': '0 25px 35px -12px rgba(239, 110, 46, 0.18)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
 
-    <h2 class="text-center text-3xl pt-6 text-dark font-medium">Login</h2>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <form class="flex flex-col items-center mt-6 gap-3" action="/login" method="post">
+    body {
+      background: #FFF9F2;
+      overflow-x: hidden;
+    }
 
-        <!-- email -->
-        <input class="rounded-2xl input px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72" type="email" placeholder="Email" autocomplete="off" name="email">
+    /* mesmerizing gradient background with shifting aurora */
+    .gradient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(125deg, #FFF4E6 0%, #FFEFDD 25%, #FFF5E8 50%, #FFEAD5 75%, #FFF2E0 100%);
+      z-index: -2;
+    }
 
-        <!-- password -->
-        <input class="rounded-2xl input px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72" type="password" placeholder="Password" autocomplete="off" name="password">
+    .aurora-overlay {
+      position: fixed;
+      top: -20%;
+      left: -20%;
+      width: 140%;
+      height: 140%;
+      background: radial-gradient(ellipse at 40% 50%, rgba(255, 200, 140, 0.2), rgba(255, 220, 170, 0.05), transparent 70%);
+      filter: blur(70px);
+      z-index: -1;
+      animation: auroraMove 18s infinite alternate;
+      pointer-events: none;
+    }
 
-        <!-- login button -->
-        <button class="btn rounded-2xl px-6 py-2 bg-white border-3 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300" type="submit">Login</button>
-    </form>
+    .aurora-overlay-2 {
+      position: fixed;
+      bottom: -10%;
+      right: -15%;
+      width: 120%;
+      height: 120%;
+      background: radial-gradient(circle at 70% 80%, rgba(255, 170, 100, 0.2), rgba(245, 158, 76, 0.05), transparent 65%);
+      filter: blur(90px);
+      animation: auroraMove 22s infinite alternate-reverse;
+      pointer-events: none;
+      z-index: -1;
+    }
 
-    <p class="text-center mt-4">Don't have an account?<a class="text-blue-700 underline" href="/register"> Register</a></p>
+    /* glassmorphic note cards with modern touch */
+    .glass-note {
+      background: rgba(255, 252, 245, 0.78);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 235, 200, 0.9);
+      box-shadow: 0 25px 40px -18px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(255, 245, 210, 0.6) inset;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
 
-{% endblock %}
+    .glass-note:hover {
+      transform: translateY(-6px) rotate(0.5deg);
+      background: rgba(255, 253, 248, 0.9);
+      border-color: #FFDDB3;
+      box-shadow: 0 30px 45px -18px rgba(0, 0, 0, 0.2);
+    }
+
+    /* primary CTA with luminous hover */
+    .btn-luminous {
+      background: linear-gradient(105deg, #F97316, #F59E0B);
+      transition: all 0.35s cubic-bezier(0.15, 0.85, 0.35, 1);
+      box-shadow: 0 10px 22px -8px rgba(249, 115, 22, 0.4);
+    }
+
+    .btn-luminous:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 28px -12px rgba(249, 115, 22, 0.55);
+      background: linear-gradient(105deg, #FB923C, #FBBF24);
+    }
+
+    /* floating animated elements */
+    .floating-note-card {
+      position: absolute;
+      will-change: transform;
+    }
+
+    @keyframes softPulse {
+      0% {
+        opacity: 0.15;
+        transform: scale(0.98);
+      }
+
+      100% {
+        opacity: 0.35;
+        transform: scale(1.02);
+      }
+    }
+
+    .glow-bg-element {
+      animation: softPulse 4s infinite alternate;
+    }
+
+    @media (max-width: 768px) {
+      .floating-note-card {
+        transform: scale(0.8);
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============= FLOATING NOTES ABOVE THE FOLD (prominently placed, no scroll needed) ============= -->
+  <!-- Large sticky note - left top region -->
+  <div
+    class="floating-note-card absolute top-[8%] left-[3%] md:left-[6%] lg:left-[8%] z-20 animate-float-gentle hidden sm:block">
+    <div class="glass-note w-44 h-44 p-4 rotate-[-5deg] flex flex-col justify-between">
+      <div class="flex gap-2">
+        <div class="w-2 h-2 rounded-full bg-orange-400"></div>
+        <div class="w-2 h-2 rounded-full bg-amber-300"></div>
+        <div class="w-2 h-2 rounded-full bg-stone-300"></div>
+      </div>
+      <div class="mt-2 space-y-2">
+        <div class="h-2 w-full bg-stone-300/50 rounded-full"></div>
+        <div class="h-2 w-3/4 bg-stone-300/40 rounded-full"></div>
+        <div class="h-2 w-5/6 bg-stone-300/40 rounded-full"></div>
+      </div>
+      <p class="text-[11px] font-medium text-stone-500 mt-2 italic">✨ brainstorm session</p>
+      <div
+        class="w-8 h-8 rounded-full bg-orange-100 self-end -mb-2 flex items-center justify-center text-orange-500 text-xs">
+        📌</div>
+    </div>
+  </div>
+
+  <!-- floating note card with content - right side, first viewport -->
+  <div class="floating-note-card absolute top-[18%] right-[3%] md:right-[7%] lg:right-[10%] z-20 animate-float-medium">
+    <div class="glass-note w-56 p-5 rotate-[4deg] backdrop-blur-md">
+      <div class="flex items-start gap-3">
+        <div class="text-2xl">📓</div>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-stone-700">quick capture</p>
+          <p class="text-xs text-stone-500 mt-1">“Just saved an idea for my project — seamless.”</p>
+          <div class="mt-2 flex gap-1">
+            <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">✨ new</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- animated sticky note / notebook style - bottom left area -->
+  <div class="floating-note-card absolute bottom-[12%] left-[2%] md:left-[5%] z-20 animate-float-swirl hidden md:block">
+    <div class="glass-note w-48 p-4 rotate-[-2deg] border-l-4 border-orange-300">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">✏️</span>
+        <span class="text-xs font-medium text-stone-600">draft: design system</span>
+      </div>
+      <div class="mt-2 flex flex-wrap gap-1">
+        <div class="w-14 h-1.5 bg-orange-200/80 rounded-full"></div>
+        <div class="w-8 h-1.5 bg-stone-200 rounded-full"></div>
+      </div>
+      <div class="text-[10px] text-stone-400 mt-2 flex justify-between"><span>just now</span><span>⚡️</span></div>
+    </div>
+  </div>
+
+  <!-- mini pencil + floating memo (glowing, top area) -->
+  <div
+    class="floating-note-card absolute top-[5%] right-[20%] md:right-[25%] z-10 animate-float-medium hidden sm:flex pointer-events-none">
+    <div
+      class="flex items-center gap-1 bg-white/30 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/60 shadow-sm">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+        class="text-orange-500">
+        <path d="M16.5 2.5L21.5 7.5L7.5 21.5H2.5V16.5L16.5 2.5Z" stroke="currentColor" stroke-width="1.2" fill="white"
+          fill-opacity="0.5" />
+        <path d="M12.5 6.5L17.5 11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+      </svg>
+      <span class="text-[11px] font-medium text-stone-600">sketch your thoughts</span>
+    </div>
+  </div>
+
+  <!-- decorative floating note grid tiny cards - middle left -->
+  <div
+    class="floating-note-card absolute top-[45%] left-[1%] lg:left-[3%] z-10 animate-float-swirl opacity-80 hidden lg:block">
+    <div
+      class="flex flex-col gap-1 bg-white/40 backdrop-blur-sm p-2 rounded-2xl border border-white/50 shadow-sm rotate-[-6deg]">
+      <div class="w-10 h-10 bg-gradient-to-br from-orange-100 to-amber-100 rounded-xl flex items-center justify-center">
+        📎</div>
+      <div class="text-[9px] text-stone-500 text-center">attachments</div>
+    </div>
+  </div>
+
+  <!-- additional floating note card that is visible above the fold on any desktop/tablet (mid-right) -->
+  <div class="floating-note-card absolute top-[55%] right-[2%] md:right-[5%] z-20 animate-float-swirl hidden md:block">
+    <div class="glass-note w-40 p-3 rotate-[6deg] bg-white/70">
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-semibold text-stone-500">⚡ RECENT</span>
+        <span class="text-xs">📌</span>
+      </div>
+      <p class="text-xs text-stone-600 mt-1 leading-tight">“Design system notes for portfolio”</p>
+      <div class="w-full h-1 bg-orange-200/60 rounded-full mt-2"></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT (HERO CENTERED: heading + supporting text perfectly centered) -->
+  <main
+    class="relative mx-auto px-6 md:px-10 lg:px-16 min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top_left,#fff1de_0%,#fdf6ec_40%,#faf7f2_100%)]">
+
+    <div
+      class="pointer-events-none absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-orange-200/50 blur-3xl">
+    </div>
+    <div
+      class="pointer-events-none absolute top-1/3 -right-32 h-[420px] w-[420px] rounded-full bg-amber-200/40 blur-3xl">
+    </div>
+    <div
+      class="pointer-events-none absolute bottom-0 left-1/3 h-[360px] w-[360px] rounded-full bg-rose-100/40 blur-3xl">
+    </div>
+
+    <!-- Minimal Navbar (clean) -->
+    <div class="py-6 md:py-8 flex justify-between items-center flex-wrap gap-3">
+      <div class="flex items-center gap-2">
+        <div
+          class="text-3xl font-black tracking-tighter bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent drop-shadow-sm">
+          ENote</div>
+        <div class="h-5 w-px bg-orange-300/70 hidden sm:block"></div>
+        <span class="text-[13px] font-medium text-stone-400 hidden sm:block tracking-wide">organized flow</span>
+      </div>
+    </div>
+
+    <!-- Hero Section: FULLY CENTERED (text-center) with mesmerizing glow -->
+    <div class="flex-1 flex flex-col items-center text-center py-10 md:py-16 lg:py-20">
+      <div class="max-w-4xl mx-auto relative">
+        <!-- subtle centered glow behind heading (enhances depth) -->
+        <div
+          class="absolute left-1/2 -translate-x-1/2 -top-20 w-[80%] h-64 bg-orange-300/20 rounded-full blur-[80px] -z-10 animate-pulse-glow-soft">
+        </div>
+
+        <h1
+          class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.1] md:leading-[1.2] text-stone-800">
+          A new home,<br>
+          <span
+            class="bg-gradient-to-r from-orange-500 via-orange-500 to-amber-500 bg-clip-text text-transparent drop-shadow-sm">for
+            your thoughts,</span><br>
+          ideas and notes
+        </h1>
+
+        <p class="text-lg sm:text-xl md:text-2xl text-stone-500/90 mt-8 max-w-2xl mx-auto leading-relaxed font-bold">
+          ✨ તમારા વિચારો માટે હવે એક નવી જગ્યા. ✨
+        </p>
+
+        <div class="mt-10 flex flex-wrap gap-5 justify-center items-center">
+          <a href="/getlogin"
+            class="btn-luminous text-white font-semibold px-8 py-4 rounded-2xl text-lg inline-block shadow-warm-elevated transition-all">
+            Login
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+
+  </main>
+
+  <!-- minimal footer / closing -->
+  <footer
+    class="relative z-30 border-t border-orange-100/60 py-5 text-center text-stone-400 text-xs bg-white/10 backdrop-blur-sm bg-[radial-gradient(ellipse_at_top_left,#fff1de_0%,#fdf6ec_40%,#faf7f2_100%)]">
+    <div class="max-w-7xl mx-auto px-6">© 2025 ENote — where clarity meets creativity. Designed for modern minds.</div>
+  </footer>
+</body>
+
+</html>
