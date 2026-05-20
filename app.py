@@ -9,6 +9,11 @@ app.secret_key = "SECRET2026"
 
 db = SQL("sqlite:///notes.db")
 
+
+@app.route("/getlogin")
+def getlogin():
+    return render_template("login.html")
+
 # Index page - login
 @app.route("/")
 def index():
@@ -38,7 +43,7 @@ def login():
         
         session["user_id"] = existed_user[0]["id"]
         
-        return flash_and_redirect(f"Successfully logged in {existed_user[0]['username']}", "success", "/home")
+        return redirect("/home")
         
     return render_template("index.html")
         
@@ -74,7 +79,7 @@ def register():
         user = db.execute("SELECT * FROM users WHERE email = ?", email)
         session["user_id"] = user[0]["id"]
 
-        return flash_and_redirect(f"Successfully registered in {user[0]['username']}", "success", "/home")
+        return redirect("/home")
     
     return render_template("register.html")
 
@@ -96,7 +101,7 @@ def add():
     
     db.execute("INSERT INTO notes (user_id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)", session.get("user_id"), title, content, datetime.now(), datetime.now())
     
-    return flash_and_redirect("Successfully added a note", "success", "/home")
+    return redirect("/home")
       
 # Show note
 @app.route("/note/<int:id>")
@@ -122,7 +127,7 @@ def update():
     else:
         db.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", id, session.get("user_id"))
     
-    return flash_and_redirect(f'Successfully {action}d "{title}"', "success", "/home")
+    return redirect("/home")
 
 
 if __name__ == "__main__":
