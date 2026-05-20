@@ -4,11 +4,19 @@ from cs50 import SQL
 from helpers import flash_and_redirect, get_email_password
 from datetime import datetime
 from password_validator import PasswordValidator
+import pymysql
+pymysql.install_as_MySQLdb()
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "SECRET2026"
+app.secret_key = os.getenv("SECRET_KEY")
 
-db = SQL("sqlite:///notes.db")
+
+sql_url = os.getenv("SQL_URL")
+db = SQL(sql_url)
 
 schema = PasswordValidator()
 schema.min(8)\
@@ -29,7 +37,7 @@ def index():
 # Home
 @app.route("/home")
 def home():
-    notes = db.execute("SELECT * FROM notes WHERE user_id = ? ORDER BY updated_at DESC", session.get("user_id"))
+    notes = db.execute("SELECT * FROM notes WHERE user_id = %s ORDER BY updated_at DESC", session.get("user_id"))
     return render_template("home.html", notes=notes)
 
 # Login
@@ -44,7 +52,7 @@ def login():
         
         email, password = result
         
-        existed_user = db.execute("SELECT * FROM users WHERE email = ?", email)
+        existed_user = db.execute("SELECT * FROM users WHERE email = %s", email)
         if len(existed_user) != 1 or not check_password_hash(existed_user[0]["password"], password):
             return flash_and_redirect("Invalid credentials", "danger", "/login")
         
@@ -90,13 +98,13 @@ def register():
         hash_password = generate_password_hash(password)
         
         try:
-            db.execute("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", username, email, hash_password) 
-        except ValueError:
+            db.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", username, email, hash_password) 
+        except Exception:
             flash("Please log in or try register with different email.", "danger")
             return redirect("/register")
             
             
-        user = db.execute("SELECT * FROM users WHERE email = ?", email)
+        user = db.execute("SELECT * FROM users WHERE email = %s", email)
         session["user_id"] = user[0]["id"]
 
         return redirect("/home")
@@ -119,14 +127,14 @@ def add():
     if not content:
         return flash_and_redirect("Must add some note", "danger", "/create")
     
-    db.execute("INSERT INTO notes (user_id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)", session.get("user_id"), title, content, datetime.now(), datetime.now())
+    db.execute("INSERT INTO notes (user_id, title, content, created_at, updated_at) VALUES (%s, %s, %s, %s, %s)", session.get("user_id"), title, content, datetime.now(), datetime.now())
     
     return redirect("/home")
       
 # Show note
 @app.route("/note/<int:id>")
 def note(id):
-    note = db.execute("SELECT * FROM notes WHERE id = ? AND user_id = ?", id, session.get("user_id"))
+    note = db.execute("SELECT * FROM notes WHERE id = %s AND user_id = %s", id, session.get("user_id"))
     return render_template("note.html", note=note)
 
 # Update or delete
@@ -138,14 +146,14 @@ def update():
     action = request.form.get("action")
     
     if action == "update":
-        existed_note = db.execute("SELECT * FROM notes WHERE id = ? AND user_id = ?", id, session.get("user_id"))
+        existed_note = db.execute("SELECT * FROM notes WHERE id = %s AND user_id = %s", id, session.get("user_id"))
 
         if title == existed_note[0]["title"] and content == existed_note[0]["content"]:
             return flash_and_redirect("Please make some changes to update a note", "danger", f"/note/{id}")
 
-        db.execute("UPDATE notes SET title = ?, content = ?, updated_at = ? WHERE id = ? AND user_id = ?", title, content, datetime.now(), id, session.get("user_id"))
+        db.execute("UPDATE notes SET title = %s, content = %s, updated_at = %s WHERE id = %s AND user_id = %s", title, content, datetime.now(), id, session.get("user_id"))
     else:
-        db.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", id, session.get("user_id"))
+        db.execute("DELETE FROM notes WHERE id = %s AND user_id = %s", id, session.get("user_id"))
     
     return redirect("/home")
 
