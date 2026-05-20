@@ -66,10 +66,10 @@ MyNotes is a web application built using Python and Flask that enables users to 
 
 ## Screenshots
 
-![Index Page](screenshots/index.png "Index Page")
-![Register Page](screenshots/register.png "Register Page")
-![Dashboard](screenshots/dashboard.png "Dashboard")
-![Create Note](screenshots/create.png "Create Note")
+![Index Page](screenshots/index-enote.png "Index Page")
+![Register Page](screenshots/register-enote.png "Register Page")
+![Dashboard](screenshots/dashboard-enote.png "Dashboard")
+![Create Note](screenshots/create-enote.png "Create Note")
 
 ---
 
