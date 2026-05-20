@@ -3,12 +3,19 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from cs50 import SQL
 from helpers import flash_and_redirect, get_email_password
 from datetime import datetime
+from password_validator import PasswordValidator
 
 app = Flask(__name__)
 app.secret_key = "SECRET2026"
 
 db = SQL("sqlite:///notes.db")
 
+schema = PasswordValidator()
+schema.min(8)\
+    .has().uppercase()\
+    .has().lowercase()\
+    .has().digits()\
+    .has().no().spaces()
 
 @app.route("/getlogin")
 def getlogin():
@@ -65,6 +72,19 @@ def register():
         username = request.form.get("username")
         if not username:
             return flash_and_redirect("Must provide Username", "danger", "/register")
+        
+        if len(username) < 4:
+            return flash_and_redirect("Username must be longer than 4 characters.", "danger", "/register")
+        
+        confirmation = request.form.get("confirmation")
+        if not confirmation:
+            return flash_and_redirect("Must provide Confirm Password", "danger", "/register")
+        
+        if not schema.validate(password):
+            return flash_and_redirect("Password must have at least 8 characters, at least one uppercase letter and one lowercase letter, must contain at least one digit and it cannot contain spaces.", "danger", "/register")
+        
+        if password != confirmation:
+            return flash_and_redirect("Password and Confirm Password do not match", "danger", "/register")
             
         
         hash_password = generate_password_hash(password)
