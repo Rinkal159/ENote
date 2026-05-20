@@ -1,49 +1,232 @@
+<!-- register.html - Modern ENote Registration Page with Gradient Theme -->
 {% extends "layout.html" %}
 
 {% block body %}
+<style>
+    /* Additional register-specific animations & glass effects */
+    .register-card {
+        background: rgba(255, 252, 245, 0.75);
+        backdrop-filter: blur(16px);
+        border-radius: 2rem;
+        border: 1px solid rgba(255, 235, 200, 0.6);
+        box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(255, 245, 215, 0.5) inset;
+    }
 
-<h2 class="text-center text-3xl pt-6 text-dark font-medium">
-    Register
-</h2>
+    .input-modern {
+        transition: all 0.25s ease;
+        background: rgba(255, 255, 245, 0.9);
+        border: 2px solid rgba(253, 186, 116, 0.5);
+    }
 
-<form class="flex flex-col items-center mt-6 gap-3" action="/register" method="post">
+    .input-modern:focus {
+        outline: none;
+        border-color: #F97316;
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        background: white;
+        transform: scale(1.02);
+    }
 
-    <!-- email -->
-    <input
-        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
-        type="email" name="email" placeholder="Email" autocomplete="off">
+    .btn-register {
+        background: linear-gradient(105deg, #F97316, #F59E0B);
+        transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        box-shadow: 0 8px 20px -6px rgba(249, 115, 22, 0.4);
+    }
 
-    <!-- username -->
-    <input
-        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
-        type="text" name="username" placeholder="Username" autocomplete="off">
+    .btn-register:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 18px 28px -10px rgba(249, 115, 22, 0.5);
+        background: linear-gradient(105deg, #FB923C, #FBBF24);
+    }
 
-    <!-- password -->
-    <input
-        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
-        type="password" name="password" placeholder="Password">
+    .floating-glow {
+        position: fixed;
+        width: 60vw;
+        height: 60vw;
+        background: radial-gradient(circle, rgba(255, 205, 158, 0.25) 0%, rgba(255, 225, 190, 0.1) 100%);
+        filter: blur(80px);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+    }
 
-    <!-- confirm password -->
-    <input
-        class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
-        type="password" name="confirmation" placeholder="Confirm Password">
+    @keyframes floatLight {
 
-    <!-- register button -->
-    <button
-        class="btn rounded-2xl px-6 py-2 bg-white border-3 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300"
-        type="submit">
+        0%,
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
 
-        Register
+        50% {
+            transform: translateY(-15px) rotate(2deg);
+        }
+    }
 
-    </button>
+    .floating-note-decor {
+        animation: floatLight 8s ease-in-out infinite;
+    }
+</style>
 
-</form>
+<!-- Background gradient layers (matching index) -->
+<div class="gradient-bg"></div>
+<div class="aurora-overlay"></div>
+<div class="aurora-overlay-2"></div>
 
-<p class="text-center mt-4">
-    Already have an account?
-    <a class="text-blue-700 underline" href="/login">
-        Login
-    </a>
-</p>
+<!-- Decorative floating elements -->
+<div
+    class="fixed top-[10%] left-[5%] w-64 h-64 rounded-full bg-orange-200/20 blur-[70px] animate-pulse-glow-soft pointer-events-none z-0">
+</div>
+<div class="fixed bottom-[15%] right-[3%] w-80 h-80 rounded-full bg-amber-200/15 blur-[90px] animate-pulse-glow-soft pointer-events-none z-0"
+    style="animation-delay: 1.5s;"></div>
+
+<!-- Main Register Form Container -->
+<div class="relative flex flex-col items-center pt-12 login-bg min-h-screen px-6 md:px-10 lg:px-16">
+
+    <!-- Logo / Brand in center-top subtle -->
+    <div class="absolute top-6 right-6 md:top-8 md:right-10 z-30">
+        <div
+            class="text-xl font-black tracking-tighter bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+            ENote</div>
+    </div>
+
+    <!-- Register Card with Glassmorphism -->
+    <div class="register-card w-full max-w-md p-8 md:p-10 relative z-20 transition-all duration-300 hover:shadow-xl">
+
+        <h1 class="text-4xl text-center text-orange-600 font-extrabold pb-2 login">Register</h1>
+
+        <form class="flex flex-col items-center mt-6 gap-3" action="/register" method="post">
+
+            <!-- email -->
+            <input class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+                type="email" name="email" placeholder="Email" autocomplete="off">
+
+            <!-- username -->
+            <input class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+                type="text" name="username" placeholder="Username" autocomplete="off">
+
+            <!-- password -->
+            <input class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+                type="password" name="password" placeholder="Password">
+
+            <!-- confirm password -->
+            <input class="input rounded-2xl px-2 py-2 bg-white border-2 border-orange-200 hover:border-orange-500 w-72"
+                type="password" name="confirmation" placeholder="Confirm Password">
+
+            <!-- register button -->
+            <button
+                class="btn rounded-2xl px-6 py-2 bg-white border-3 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300"
+                type="submit">
+
+                Register
+
+            </button>
+
+        </form>
+
+        <!-- Divider -->
+        <div class="relative my-8">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-orange-200/50"></div>
+            </div>
+            <div class="relative flex justify-center text-xs">
+                <span class="px-3 bg-transparent text-stone-400">or</span>
+            </div>
+        </div>
+
+        <!-- Login Link -->
+        <p class="text-center text-stone-600 text-sm">
+            Already have an account?
+            <a class="text-orange-600 font-semibold hover:text-orange-700 transition-all hover:underline decoration-2 underline-offset-2"
+                href="/getlogin">
+                Login →
+            </a>
+        </p>
+    </div>
+
+    <!-- Footer note -->
+    <p class="text-center text-stone-400 text-[11px] mt-8 z-20">
+        By joining, you agree to our <a href="#" class="underline hover:text-orange-500">Terms</a> and <a href="#"
+            class="underline hover:text-orange-500">Privacy</a>.
+    </p>
+</div>
+
+<!-- Additional floating note paper element -->
+<div class="fixed bottom-8 left-8 z-10 opacity-40 pointer-events-none hidden md:block">
+    <div class="relative w-16 h-20 bg-white/40 backdrop-blur-sm rounded-lg rotate-12 border border-white/50"></div>
+</div>
+
+<style>
+    /* Ensure gradient backgrounds are imported from parent but redefined for safety */
+    .gradient-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(125deg, #FFF4E6 0%, #FFEFDD 25%, #FFF5E8 50%, #FFEAD5 75%, #FFF2E0 100%);
+        z-index: -2;
+    }
+
+    .aurora-overlay {
+        position: fixed;
+        top: -20%;
+        left: -20%;
+        width: 140%;
+        height: 140%;
+        background: radial-gradient(ellipse at 40% 50%, rgba(255, 200, 140, 0.2), rgba(255, 220, 170, 0.05), transparent 70%);
+        filter: blur(70px);
+        z-index: -1;
+        animation: auroraMove 18s infinite alternate;
+        pointer-events: none;
+    }
+
+    .aurora-overlay-2 {
+        position: fixed;
+        bottom: -10%;
+        right: -15%;
+        width: 120%;
+        height: 120%;
+        background: radial-gradient(circle at 70% 80%, rgba(255, 170, 100, 0.2), rgba(245, 158, 76, 0.05), transparent 65%);
+        filter: blur(90px);
+        animation: auroraMove 22s infinite alternate-reverse;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    @keyframes auroraMove {
+        0% {
+            transform: translateX(-10%) translateY(-5%) scale(1);
+        }
+
+        100% {
+            transform: translateX(10%) translateY(5%) scale(1.2);
+        }
+    }
+
+    @keyframes pulse-glow-soft {
+
+        0%,
+        100% {
+            opacity: 0.2;
+            transform: scale(0.96);
+        }
+
+        50% {
+            opacity: 0.5;
+            transform: scale(1.08);
+        }
+    }
+
+    .animate-pulse-glow-soft {
+        animation: pulse-glow-soft 4.5s ease-in-out infinite;
+    }
+
+    .glass-note {
+        background: rgba(255, 252, 245, 0.78);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 235, 200, 0.9);
+        box-shadow: 0 25px 40px -18px rgba(0, 0, 0, 0.12);
+    }
+</style>
 
 {% endblock %}
