@@ -14,7 +14,7 @@
   - [Features](#features)
   - [Technologies Used](#technologies-used)
   - [Screenshots](#screenshots)
-  - [Function Overview](#function-overview)
+  - [Function **Overview**](#function-overview)
     - [`index()`](#index)
     - [`home()`](#home)
     - [`login()`](#login)
@@ -66,14 +66,14 @@ MyNotes is a web application built using Python and Flask that enables users to 
 
 ## Screenshots
 
-![Login Page](screenshots/login.png "Login Page")
+![Index Page](screenshots/index.png "Index Page")
 ![Register Page](screenshots/register.png "Register Page")
 ![Dashboard](screenshots/dashboard.png "Dashboard")
 ![Create Note](screenshots/create.png "Create Note")
 
 ---
 
-## Function Overview
+## Function **Overview**
 
 ### `index()`
 Displays the landing page of the application.
