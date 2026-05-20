@@ -4,8 +4,6 @@ from cs50 import SQL
 from helpers import flash_and_redirect, get_email_password
 from datetime import datetime
 from password_validator import PasswordValidator
-import pymysql
-pymysql.install_as_MySQLdb()
 from dotenv import load_dotenv
 import os
 
