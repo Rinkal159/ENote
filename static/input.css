@@ -36,3 +36,12 @@
 .btn-form {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 }
+
+
+.login-bg {
+    background: linear-gradient(125deg, #FFF4E6 0%, #FFEFDD 25%, #FFF5E8 50%, #FFEAD5 75%, #FFF2E0 100%);
+}
+
+.login {
+    font-family: 'Inter', 'system-ui', 'SF Pro Display', 'SF Pro Text', 'Segoe UI', '-apple-system', 'sans-serif';
+}
