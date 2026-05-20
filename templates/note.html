@@ -1,31 +1,480 @@
+<!-- note.html - Modern ENote Note Detail Page with Gradient Theme -->
 {% extends "layout.html" %}
 
 {% block body %}
+<style>
+  /* Custom animations and gradient styles for note page */
+  .gradient-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(125deg, #FFF4E6 0%, #FFEFDD 25%, #FFF5E8 50%, #FFEAD5 75%, #FFF2E0 100%);
+    z-index: -2;
+  }
+  
+  .aurora-overlay {
+    position: fixed;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(ellipse at 40% 50%, rgba(255, 200, 140, 0.25), rgba(255, 220, 170, 0.08), transparent 70%);
+    filter: blur(70px);
+    z-index: -1;
+    animation: auroraMove 18s infinite alternate;
+    pointer-events: none;
+  }
+  
+  .aurora-overlay-2 {
+    position: fixed;
+    bottom: -10%;
+    right: -15%;
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle at 70% 80%, rgba(255, 170, 100, 0.2), rgba(245, 158, 76, 0.06), transparent 65%);
+    filter: blur(90px);
+    animation: auroraMove 22s infinite alternate-reverse;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  @keyframes auroraMove {
+    0% { transform: translateX(-10%) translateY(-5%) scale(1); }
+    100% { transform: translateX(10%) translateY(5%) scale(1.2); }
+  }
+  
+  @keyframes pulse-glow-soft {
+    0%, 100% { opacity: 0.2; transform: scale(0.96); }
+    50% { opacity: 0.5; transform: scale(1.08); }
+  }
+  
+  @keyframes floatLight {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(2deg); }
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  
+  .animate-pulse-glow-soft {
+    animation: pulse-glow-soft 4.5s ease-in-out infinite;
+  }
+  
+  .float-animation {
+    animation: floatLight 8s ease-in-out infinite;
+  }
+  
+  .float-animation-delayed {
+    animation: floatLight 10s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+  
+  /* Glassmorphic form container */
+  .note-form-container {
+    background: rgba(255, 252, 245, 0.75);
+    backdrop-filter: blur(16px);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 235, 200, 0.6);
+    box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(255,245,215,0.5) inset;
+    transition: all 0.3s ease;
+  }
+  
+  .note-form-container:hover {
+    box-shadow: 0 30px 55px -15px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 220, 180, 0.8);
+  }
+  
+  /* Title input styling */
+  .title-input {
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    font-weight: 600;
+    width: 100%;
+    padding: 0.75rem 0;
+    transition: all 0.2s ease;
+    color: #3B2F24;
+  }
+  
+  .title-input:focus {
+    outline: none;
+    border-bottom: 2px solid #F97316;
+  }
+  
+  .title-input::placeholder {
+    color: #C9B6A0;
+    font-weight: 500;
+    opacity: 0.6;
+  }
+  
+  /* Content textarea styling */
+  .content-textarea {
+    background: transparent;
+    border: none;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    resize: vertical;
+    width: 100%;
+    color: #4A3B2C;
+  }
+  
+  .content-textarea:focus {
+    outline: none;
+  }
+  
+  .content-textarea::placeholder {
+    color: #C9B6A0;
+    font-style: italic;
+    opacity: 0.6;
+  }
+  
+  /* Update button styling */
+  .btn-update {
+    background: linear-gradient(105deg, #F97316, #F59E0B);
+    transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    box-shadow: 0 8px 20px -6px rgba(249, 115, 22, 0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-update::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .btn-update:hover::before {
+    left: 100%;
+  }
+  
+  .btn-update:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 28px -10px rgba(249, 115, 22, 0.55);
+    background: linear-gradient(105deg, #FB923C, #FBBF24);
+  }
+  
+  /* Delete button styling */
+  .btn-delete {
+    background: transparent;
+    border: 2px solid #EF4444;
+    color: #EF4444;
+    transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-delete:hover {
+    background: #EF4444;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 18px 28px -10px rgba(239, 68, 68, 0.4);
+    border-color: #EF4444;
+  }
+  
+  /* Character counter styling */
+  .char-counter {
+    transition: all 0.2s ease;
+  }
+  
+  /* Floating decorative elements */
+  .floating-note-decor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .glass-note {
+    background: rgba(255, 252, 245, 0.78);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 235, 200, 0.9);
+    box-shadow: 0 25px 40px -18px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Info card styling */
+  .info-card {
+    background: rgba(255, 250, 240, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 235, 200, 0.5);
+    transition: all 0.3s ease;
+  }
+  
+  .info-card:hover {
+    background: rgba(255, 250, 240, 0.8);
+    transform: translateX(5px);
+  }
+  
+  /* Delete confirmation modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background: rgba(255, 252, 245, 0.95);
+    backdrop-filter: blur(16px);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 220, 180, 0.8);
+    max-width: 400px;
+    width: 90%;
+    animation: modalSlideIn 0.3s ease;
+  }
+  
+  @keyframes modalSlideIn {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .shake {
+    animation: shake 0.5s ease-in-out;
+  }
+</style>
 
-<form action="/update" method="post" class="max-w-[80%] mx-auto bg-white flex flex-col items-start gap-4 ">
+<!-- Background gradient layers -->
+<div class="gradient-bg"></div>
+<div class="aurora-overlay"></div>
+<div class="aurora-overlay-2"></div>
 
-    <input type="hidden" name="id" value="{{note[0]['id']}}">
+<!-- Glow particles for depth -->
+<div class="fixed top-[10%] right-[5%] w-80 h-80 rounded-full bg-orange-200/20 blur-[90px] animate-pulse-glow-soft pointer-events-none z-0"></div>
+<div class="fixed bottom-[15%] left-[3%] w-96 h-96 rounded-full bg-amber-200/15 blur-[100px] animate-pulse-glow-soft pointer-events-none z-0" style="animation-delay: 1.5s;"></div>
+<div class="fixed top-[60%] right-[10%] w-64 h-64 rounded-full bg-orange-100/20 blur-[70px] animate-pulse-glow-soft pointer-events-none z-0" style="animation-delay: 0.8s;"></div>
 
-    <!-- title -->
-    <input
-        class="border-0 bg-white focus:outline-none focus:ring-0 focus:border-gray-400 active:outline-none text-4xl m-8 mb-4 font-medium"
-        type="text" name="title" autocomplete="off" value="{{note[0]['title']}}">
 
-    <!-- content -->
-    <textarea class="outline-none focus:outline-none focus:ring-0 resize-none text-2xl mx-8" name="content" rows="12"
-        cols="100" placeholder="Your note starts here...">{{note[0]['content']}}</textarea>
-
-    <div class="flex">
-        <!-- update button -->
-        <button
-            class="btn-form rounded-xl px-6 py-1.5 bg-white border-2 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300 ml-8 mb-8"
-            type="submit" name="action" value="update">Update</button>
-
-        <!-- update button -->
-        <button
-            class="btn-form rounded-xl px-6 py-1.5 bg-white border-2 border-orange-500 text-black hover:border-3 mt-2 hover:border-orange-700 hover:scale-105 transition duration-300 ml-4 mb-8"
-            type="submit" name="action" value="delete">Delete</button>
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal-overlay">
+  <div class="modal-content p-6 text-center">
+    <div class="mb-4">
+      <span class="text-6xl">🗑️</span>
     </div>
-</form>
+    <h3 class="text-xl font-bold text-stone-800 mb-2">Delete Note?</h3>
+    <p class="text-stone-500 text-sm mb-6">This action cannot be undone. This note will be permanently removed.</p>
+    <div class="flex gap-3 justify-center">
+      <button id="cancelDelete" class="px-5 py-2 rounded-xl border-2 border-stone-300 text-stone-600 hover:bg-stone-100 transition-all font-medium">
+        Cancel
+      </button>
+      <button id="confirmDelete" class="px-5 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600 transition-all font-medium">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="relative z-20 pt-16 max-w-6xl mx-auto px-6 md:px-10 lg:px-16 pb-24">
+
+  <!-- Form Container -->
+  <form action="/update" method="post" class="note-form-container w-full" id="noteForm">
+    
+    <input type="hidden" name="id" value="{{ note[0]['id'] }}">
+    <input type="hidden" name="action" value="update" id="actionInput">
+    
+    <!-- Title Section -->
+    <div class="px-8 pt-8 pb-4">
+      <input 
+        class="title-input bg-transparent focus:outline-none w-full text-stone-800 placeholder-stone-300"
+        type="text" 
+        name="title" 
+        autocomplete="off" 
+        value="{{ note[0]['title'] }}"
+        id="noteTitle"
+        autofocus>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-orange-200/50 mx-8"></div>
+    
+    <!-- Content Section -->
+    <div class="px-8 py-6">
+      <textarea 
+        class="content-textarea bg-transparent focus:outline-none w-full text-stone-700 placeholder-stone-300 min-h-[300px]"
+        name="content" 
+        rows="14" 
+        placeholder="Your note starts here... Write anything that comes to mind. Ideas, tasks, dreams, or daily reflections."
+        id="noteContent">{{ note[0]['content'] }}</textarea>
+    </div>
+    
+    <!-- Character Counter and Action Bar -->
+    <div class="border-t border-orange-200/50 mx-8"></div>
+    
+    <div class="px-8 py-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="char-counter text-xs text-stone-400 flex items-center gap-3">
+        <span id="charCount">0</span>
+        <span>characters</span>
+        <span class="w-px h-3 bg-stone-300"></span>
+        <span id="wordCount">0</span>
+        <span>words</span>
+        <span class="w-px h-3 bg-stone-300"></span>
+        <span>Last edited today</span>
+      </div>
+      
+      <div class="flex gap-3">
+        <a href="/home" class="px-5 py-2 rounded-xl border-2 border-stone-300 text-stone-600 hover:bg-stone-50 hover:border-stone-400 transition-all font-medium text-sm">
+          Cancel
+        </a>
+        <button type="button" id="updateBtn" class="btn-update text-white font-semibold px-6 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+          Update Note
+        </button>
+        <button type="button" id="deleteBtn" class="btn-delete font-semibold px-6 py-2 rounded-xl transition-all duration-300 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+    
+  </form>
+  
+ 
+  
+</div>
+
+<!-- Floating paper corner decoration -->
+<div class="fixed bottom-6 right-6 z-10 opacity-20 pointer-events-none hidden lg:block">
+  <div class="relative w-20 h-24 bg-white/40 backdrop-blur-sm rounded-lg -rotate-12 border border-white/50"></div>
+</div>
+
+<!-- JavaScript for character counter, word counter, and delete confirmation -->
+<script>
+  // Live character and word counter for better UX
+  const titleInput = document.getElementById('noteTitle');
+  const contentTextarea = document.getElementById('noteContent');
+  const charCountSpan = document.getElementById('charCount');
+  const wordCountSpan = document.getElementById('wordCount');
+  const updateBtn = document.getElementById('updateBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+  const deleteModal = document.getElementById('deleteModal');
+  const cancelDelete = document.getElementById('cancelDelete');
+  const confirmDelete = document.getElementById('confirmDelete');
+  const noteForm = document.getElementById('noteForm');
+  const actionInput = document.getElementById('actionInput');
+  
+  function updateCounters() {
+    const content = contentTextarea.value;
+    const title = titleInput.value;
+    
+    // Character count (title + content)
+    const totalChars = (title + content).length;
+    charCountSpan.textContent = totalChars.toLocaleString();
+    
+    // Word count (split by whitespace, filter empty strings)
+    const words = content.trim().split(/\s+/).filter(word => word.length > 0);
+    const wordCount = content.trim() === '' ? 0 : words.length;
+    wordCountSpan.textContent = wordCount.toLocaleString();
+  }
+  
+  if (contentTextarea && titleInput) {
+    contentTextarea.addEventListener('input', updateCounters);
+    titleInput.addEventListener('input', updateCounters);
+    updateCounters(); // Initial call
+  }
+  
+  // Handle update button click
+  if (updateBtn) {
+    updateBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      actionInput.value = 'update';
+      noteForm.submit();
+    });
+  }
+  
+  // Handle delete button click - show modal
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      deleteModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    });
+  }
+  
+  // Handle cancel delete
+  if (cancelDelete) {
+    cancelDelete.addEventListener('click', function() {
+      deleteModal.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+  }
+  
+  // Handle confirm delete
+  if (confirmDelete) {
+    confirmDelete.addEventListener('click', function() {
+      actionInput.value = 'delete';
+      noteForm.submit();
+    });
+  }
+  
+  // Close modal when clicking outside
+  if (deleteModal) {
+    deleteModal.addEventListener('click', function(e) {
+      if (e.target === deleteModal) {
+        deleteModal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+  }
+  
+</script>
+
+<!-- Additional smooth placeholder animation -->
+<style>
+  /* Smooth focus effects */
+  .title-input:focus {
+    border-bottom-color: #F97316;
+  }
+  
+  .content-textarea:focus {
+    background: rgba(255, 250, 240, 0.3);
+    border-radius: 12px;
+  }
+  
+  /* Custom scrollbar for textarea */
+  .content-textarea::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .content-textarea::-webkit-scrollbar-track {
+    background: #FFF1E6;
+    border-radius: 10px;
+  }
+  
+  .content-textarea::-webkit-scrollbar-thumb {
+    background: #FBBF24;
+    border-radius: 10px;
+  }
+  
+  .content-textarea::-webkit-scrollbar-thumb:hover {
+    background: #F97316;
+  }
+</style>
 
 {% endblock %}
