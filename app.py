@@ -9,6 +9,9 @@ import os
 
 load_dotenv()
 
+
+
+
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -97,8 +100,9 @@ def register():
         
         try:
             db.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", username, email, hash_password) 
-        except Exception:
-            flash("Please log in or try register with different email.", "danger")
+        except Exception as e:
+            print(f"{e}")
+            flash(f"{e}", "danger")
             return redirect("/register")
             
             
