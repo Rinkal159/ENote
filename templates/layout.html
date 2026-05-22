@@ -19,13 +19,12 @@
 
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 
 </head>
 
 <body>
-    <!-- green-400, orange-600 -->
+    <!-- HEADER -->
     <header class="navbar px-4 py-4 border-b bg-orange-100 text-orange-600 text-2xl flex justify-between">
         <span class="border-l-4 pl-2 font-bold border-orange-700">ENote</span>
         {% if session.get("user_id") %}
@@ -46,8 +45,7 @@
     {% endif %}
     {% endwith %}
 
-
-
+    <!-- BODY -->
     <div class="min-h-screen bg-orange-50">
         {% block body %}{% endblock %}
     </div>
@@ -55,10 +53,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
     </script>
 
-
-    <!-- <footer>
-        Built by Rinkal Singapuri
-    </footer> -->
 </body>
 
 </html>

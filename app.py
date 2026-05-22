@@ -31,12 +31,6 @@ def getlogin():
 def index():
     return render_template("index.html")
 
-# Home
-@app.route("/home")
-def home():
-    notes = db.execute("SELECT * FROM notes WHERE user_id = %s ORDER BY updated_at DESC", session.get("user_id"))
-    return render_template("home.html", notes=notes)
-
 # Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -58,7 +52,13 @@ def login():
         return redirect("/home")
         
     return render_template("login.html")
-        
+
+# Home
+@app.route("/home")
+def home():
+    notes = db.execute("SELECT * FROM notes WHERE user_id = %s ORDER BY updated_at DESC", session.get("user_id"))
+    return render_template("home.html", notes=notes)
+       
 # Logout
 @app.route("/logout")
 def logout():
