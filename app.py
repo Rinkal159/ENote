@@ -9,12 +9,8 @@ import os
 
 load_dotenv()
 
-
-
-
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-
 
 sql_url = os.getenv("SQL_URL")
 db = SQL(sql_url)
