@@ -2,7 +2,7 @@
 
 > A Flask-based note-taking application that allows users to create, organize, and manage personal notes securely.
 
-**Video Demo:** [<video_link>](https://youtu.be/wy3tHnSbyOo)
+**Video Demo:** https://youtu.be/wy3tHnSbyOo
 
 ---
 
